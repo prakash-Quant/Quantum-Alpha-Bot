@@ -28,3 +28,15 @@ To combat "whipsaw" losses in choppy markets, a Relative Strength Index (RSI) fi
 Upgraded Strategy: Trend + ExhaustionThe bot now requires two independent conditions to align before risking capital:Trend Confirmation: The fast $SMA_{45}$ must cross above the slow $SMA_{190}$.Momentum Exhaustion: The 14-period RSI must be below 60.This ensures the engine does not execute a "BUY" on an asset that is already overbought, protecting against sudden price corrections at the top of a spike.
 
 The Custom Math EngineInstead of relying on external indicator libraries, the RSI logic is hardcoded using pure pandas for maximum execution speed and deep customization:Uses .diff() to calculate minute-by-minute price velocity.Utilizes .clip() to isolate positive gains and negative losses into independent rolling matrices.Applies a 14-period .rolling().mean() to calculate the Relative Strength (RS) ratio, normalized into a real-time 0-100 RSI score.
+
+Update (Day 26): Dynamic Trailing Stop-Loss
+To maximize profitability during strong market trends, the static "Take-Profit" ceiling was replaced with an adaptive Trailing Stop-Loss system. This allows the engine to capture maximum upside momentum while strictly defining downside risk.
+Dynamic Risk Logic
+Peak Memory Tracking: Upon entering a position, the bot actively tracks and updates the highest_price achieved during the trade's lifespan.
+Drawdown Execution: The system calculates the real-time drawdown from the recorded peak. If the price drops by 1.5% from the absolute high, the bot triggers a TRAILING_STOP execution to lock in profits.
+Hard Stop Preservation: A static -1.0% Stop-Loss from the initial buy price remains actively calculated to protect capital in the event of an immediate reversal.
+Technical Implementation
+Real-time percentage delta calculations integrated directly into the core while loop.
+Automated variable resets (highest_price = 0) tied to the "Cooldown" state to prevent memory leaks or logic errors between separate trade events.
+Upgraded terminal UI to display real-time tracking of the active peak and current trailing drawdown percentage.
+
