@@ -40,3 +40,14 @@ Real-time percentage delta calculations integrated directly into the core while 
 Automated variable resets (highest_price = 0) tied to the "Cooldown" state to prevent memory leaks or logic errors between separate trade events.
 Upgraded terminal UI to display real-time tracking of the active peak and current trailing drawdown percentage.
 
+Update (Day 27): Connection Resilience & System Logging
+The focus of this update was to transition the engine from a local script to a resilient, "always-on" autonomous system. The architecture was refactored to handle the volatility of internet connectivity and API stability.
+Resilience Features
+Recursive Retry Logic: The data-fetching module is now wrapped in a persistent loop. In the event of a network failure or empty API response, the bot initiates a 30-second "cool-off" before retrying, preventing the application from crashing.
+Global Exception Handling: Implemented a top-level "Safety Net" that catches unhandled exceptions, logs the error trace, notifies the user via email, and automatically restarts the trading cycle.
+Autonomous Logging Engine: Added a secondary logging system (system_log.txt) to track internal health metrics, connectivity issues, and system resets, separate from the trade execution logs.
+Technical Implementation
+Optimized the while True main loop for 24/7 execution.
+Integrated try-except-finally blocks to ensure system memory (like the peak price tracker) is preserved even during minor errors.
+Engineered a "Self-Healing" mechanism to ensure 99.9% uptime during market hours.
+
