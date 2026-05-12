@@ -51,3 +51,10 @@ Optimized the while True main loop for 24/7 execution.
 Integrated try-except-finally blocks to ensure system memory (like the peak price tracker) is preserved even during minor errors.
 Engineered a "Self-Healing" mechanism to ensure 99.9% uptime during market hours.
 
+v1.5 Update (Day 28): Command Center & Performance AnalyticsThis update transforms the terminal output into a high-visibility dashboard, providing real-time quantitative metrics and visual cues for better monitoring.
+
+Analytics & UI FeaturesSession Persistence: On startup, the engine parses trade_log.csv to reconstruct historical performance data, ensuring that Total PnL and Win/Loss metrics are preserved across restarts.
+ANSI Color Mapping: Integrated a color-coded notification system to provide immediate status awareness:Green: Entry signals and profitable trade windows.Red: Exit signals, Stop-Loss triggers, and drawdowns.Yellow: Overbought/Oversold RSI alerts and connection warnings.
+Live Dashboard Ticker: Refactored the logging output into a non-scrolling "Live Ticker" that updates the current price, RSI, active trade PnL, and total account health on a single line.
+Technical ImplementationWin Rate Formula: $Win Rate = \left( \frac{Total Wins}{Total Trades} \right) \times 100$Utilized sys.stdout.write and \r for in-place terminal updates.Implemented automated PnL aggregation using pandas for historical log recovery
+
