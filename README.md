@@ -58,3 +58,13 @@ ANSI Color Mapping: Integrated a color-coded notification system to provide imme
 Live Dashboard Ticker: Refactored the logging output into a non-scrolling "Live Ticker" that updates the current price, RSI, active trade PnL, and total account health on a single line.
 Technical ImplementationWin Rate Formula: $Win Rate = \left( \frac{Total Wins}{Total Trades} \right) \times 100$Utilized sys.stdout.write and \r for in-place terminal updates.Implemented automated PnL aggregation using pandas for historical log recovery
 
+
+(Day 29): Incremental Data Processing
+Refactored the data ingestion engine to move away from redundant bulk downloads, significantly optimizing network bandwidth and processing speed.
+
+Optimization Logic
+Stateful Data Management: The bot now maintains a master_df in active memory, eliminating the need to re-calculate historical indicators from scratch every minute.
+
+Sliding Window Architecture: Implemented a buffer limit of 250 rows. As new 1-minute candles are "stitched" to the bottom of the DataFrame, the oldest data points are "trimmed" from the top.
+
+Duplicate Mitigation: Integrated a deduplication layer to handle overlapping data points from the API provider, ensuring the SMA and RSI calculations remain mathematically precise.
