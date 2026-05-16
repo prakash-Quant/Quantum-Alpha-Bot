@@ -77,3 +77,12 @@ Risk EngineeringAverage True Range (ATR) Integration: Implemented the ATR indica
 This prevents "whipsawing"—where a bot is stopped out due to normal volatility rather than a trend reversal.
 Dynamic Stop-Loss Logic: Replaced the fixed 1.0% stop-loss with a multiplier-based system.Formula: $Stop\ Loss = Entry\ Price - (ATR \times 2.0)$Adaptive Buffering: The system now automatically grants "room to breathe" for trades during high-volatility sessions while tightening protection during low-volatility consolidation.
 Technical Stack Upgrades:Enhanced pandas vectorization for True Range calculation using .shift() and .abs() functions.Updated the Command Center UI to display the active Dynamic ATR Stop Price in real-time.
+
+Day 32 - Dynamic Position Sizing Engine
+Upgraded the execution engine to handle real-world capital allocation via risk-adjusted position sizing, based on real-time volatility metrics. The system no longer trades static quantities; it dynamically sizes every entry to normalize risk.
+Capital Management Implementation
+Fixed Fractional Risk: Implemented a global portfolio parameter, hard-capping the maximum allowable loss per trade to exactly 1% of the total rolling account equity.
+Volatility-Adjusted Quantity: The bot calculates exact share order sizing dynamically using the current ATR (Average True Range) stop distance:
+Position Size = Total Risk Capital / ATR Stop Distance
+Compounding Ready: As the portfolio grows from profitable trades, the 1% risk allocation automatically scales up the position sizing for future trades, allowing for autonomous mathematical compounding.
+UI Upgrade: The Command Center live ticker was overhauled to display real-time Qty (Shares Held), Acct (Total Portfolio Capital), and active monetary values (₹) rather than raw price-point differences.
