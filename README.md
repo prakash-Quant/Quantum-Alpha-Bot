@@ -86,3 +86,7 @@ Volatility-Adjusted Quantity: The bot calculates exact share order sizing dynami
 Position Size = Total Risk Capital / ATR Stop Distance
 Compounding Ready: As the portfolio grows from profitable trades, the 1% risk allocation automatically scales up the position sizing for future trades, allowing for autonomous mathematical compounding.
 UI Upgrade: The Command Center live ticker was overhauled to display real-time Qty (Shares Held), Acct (Total Portfolio Capital), and active monetary values (₹) rather than raw price-point differences.
+
+Day 33: Mathematical Expectancy Engine (Dynamic Take-Profit)Upgraded the execution engine to enforce algorithmic profit extraction based on mathematical risk-to-reward ratios.
+Asymmetric Risk Management ProfileDynamic Profit Targets: Implemented an automated profit extraction layer mapped to current market volatility.$\text{Take-Profit Target} = \text{Entry Price} + (ATR \times 3.0)$Enforced Risk-to-Reward (R:R): Combined with the existing $2.0 \times ATR$ stop-loss framework, the execution engine enforces an explicit 1:1.5 Asymmetric R:R structure.
+State Management: Added take_profit_price state persistence within the primary control loop to monitor and immediately execute limit-style exits when targets are breached.UI Overhead: Expanded live telemetry to print the targeted monetization zone whenever a capital allocation position is active.
