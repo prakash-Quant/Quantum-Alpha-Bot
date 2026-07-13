@@ -112,3 +112,40 @@ Added global persistent state container last_exit_time = 0 to preserve accurate 
  (Day 37) - Direction-Agnostic Execution Core & Short CoreRefactored the primary system architecture from a constrained single-vector (Long-Only) paradigm into a fully decoupled, two-way directional state machine capable of short selling and downside capital exploitation.⚙️ Asymmetric Two-Way Architecture ImplementationDirectional Logic Decoupling: Replaced localized static variables with global direction-agnostic state containers:Changed last_buy_price $\rightarrow$ entry_priceIntroduced position_type control variable to store 'LONG', 'SHORT', or 'NONE'.State Inversion Calculus: Engineered dual-pathed math matrix routines to calculate target brackets dynamically based on position state vectors:LONG: $\text{Stop} = \text{Entry} - \Delta_{\text{ATR}}$, $\text{Target} = \text{Entry} + \Delta_{\text{ATR}}$SHORT: $\text{Stop} = \text{Entry} + \Delta_{\text{ATR}}$, $\text{Target} = \text{Entry} - \Delta_{\text{ATR}}$Reverse Risk Protections: Overhauled risk engine routines to mirror execution boundaries for short-side trades:Breakeven Engine: Tracks down-move limits, hard-pegging the dynamic stop-loss down to entry once price drops by $1.0 \times \text{ATR}$.Partial Take-Profit Slicing: Liquidates exactly 50% of position size at $1.5 \times \text{ATR}$ down-move milestones.Trailing Stops: Implemented persistent valley tracking (lowest_price = 999999) to dynamically trail downside momentum allocations using percentage-based trailing bands.Telemetry & Pipeline Refactoring: Rebuilt the live Command Center UI monitor and external logging arrays to output real-time data structures, labels, and statistics for active LONG and SHORT positions seamlessly.
 
  (Day 38) - Multi-Timeframe (MTF) Trend Filtering PipelineIntegrated an asymmetrical, cross-timeframe trend filter engine within the strategy confluence array to ensure execution routines only fire in alignment with institutional macro-scale order flow.⚙️ Temporal Equivalency Filtering ImplementationTimeframe Space Compression: To optimize resource utility and eliminate dual-stream network fetch latency, the architecture translates multi-timeframe conditions into single-stream matrix lookbacks using temporal multiplication:$$\text{Lookback Window} = \text{Target Period} \times \text{Timeframe Ratio} = 50 \times 15\text{m} = 750 \text{ candles}$$Data Core Expansion: Increased initial system historical warm-up fetches from period='5d' to period='7d' within the yf.download module to generate a valid data array required to populate the localized rolling SMA_750 vector without NaN allocation drops.Macro Matrix Guard Rules: Enforced mathematical bounds inside the primary confluence evaluation node:macro_bullish = current_price > macro_baseline (Prerequisite constraint for LONG entries)macro_bearish = current_price < macro_baseline (Prerequisite constraint for SHORT entries)Real-time UI Diagnostics: Appended active macro status indicators to the Command Center visualization loop, parsing real-time evaluations directly to terminal stream arrays as either green BULLISH TIDE or red BEARISH TIDE configurations
+
+
+
+
+
+ ## Day 53: The Smart Gatekeeper (Multi-Condition Signals)
+ Objective
+Upgrade the basic algorithmic signal generator from Day 51 by implementing strict, multi-conditional logic to filter out market noise and prevent sub-optimal trading execution.
+
+
+* **Multi-Conditional Logic:** Using the SQL `AND` operator within `CASE WHEN` blocks.
+* **Quantitative Strategy:** Implementing "Buy the Dip" and "Sell the Peak" logic directly inside the SQL engine.
+* **Signal Filtering:** Restricting the algorithm from firing signals during highly volatile, unfavorable market conditions.
+
+The Trading Logic
+Instead of relying solely on price momentum (`price_delta`), the query now cross-references momentum with the 3-tick Simple Moving Average (`sma_3`).
+
+| Strategy | SQL Logic | Layman's Explanation |
+| :--- | :--- | :--- |
+| **Buy the Dip** | `price_delta > 0 AND price < sma_3` | Price is ticking up, but the asset is still considered "cheap" relative to its recent average. |
+| **Sell the Peak** | `price_delta < 0 AND price > sma_3` | Price is ticking down, but the asset is still considered "expensive" relative to its recent average. |
+| **Hold** | `ELSE 'HOLD'` | If neither strict condition is met, do not execute a trade. |
+
+### 💻 Code Snippet
+```sql
+SELECT 
+    time_stamp, 
+    price, 
+    sma_3,
+    price_delta,
+    CASE 
+        WHEN price_delta > 0 AND price < sma_3 THEN 'BUY (Dip) 🟢'
+        WHEN price_delta < 0 AND price > sma_3 THEN 'SELL (Peak) 🔴'
+        ELSE 'HOLD 🟡'
+    END AS smart_signal
+FROM v_market_features
+WHERE price_delta IS NOT NULL;
