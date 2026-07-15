@@ -135,8 +135,8 @@ Instead of relying solely on price momentum (`price_delta`), the query now cross
 | **Sell the Peak** | `price_delta < 0 AND price > sma_3` | Price is ticking down, but the asset is still considered "expensive" relative to its recent average. |
 | **Hold** | `ELSE 'HOLD'` | If neither strict condition is met, do not execute a trade. |
 
-### 💻 Code Snippet
-```sql
+ 💻 Code Snippet
+sql
 SELECT 
     time_stamp, 
     price, 
@@ -149,3 +149,15 @@ SELECT
     END AS smart_signal
 FROM v_market_features
 WHERE price_delta IS NOT NULL;
+ Day 54: Database Optimization & Indexing (Performance Scaling)
+ Objective
+Optimize the SQLite database to handle high-frequency time-series querying by eliminating full table scans.
+Core Concepts
+* **Database Indexing:** Creating B-Tree structures to drastically reduce read/query times.
+* **Composite Indexes:** Indexing multiple columns simultaneously (`asset_id`, `time_stamp`) to match the specific `ORDER BY` and `PARTITION BY` clauses used in the pipeline's Window Functions.
+* **Query Optimizer Execution:** Allowing the SQL engine to automatically route queries through the index for O(log N) lookup speeds.
+ 💻 Code Snippet: The Index Implementation
+sql
+-- Creating a composite index for ultra-fast time-series queries
+CREATE INDEX IF NOT EXISTS idx_asset_time 
+ON price_ticks2 (asset_id, time_stamp);
